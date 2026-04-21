@@ -6,7 +6,7 @@ on:
       - main
 
 jobs:
-  Release:
+  release:
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -20,6 +20,6 @@ jobs:
           gh release delete latest --yes 2>/dev/null || true
           gh release create latest \
             --title latest \
-            --generate-notes \
+            --notes "See README for usage: https://github.com/hiroya-uga/git-cd#readme" \
             bin/git-cd \
             install.sh
