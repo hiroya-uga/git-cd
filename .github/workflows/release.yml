@@ -11,7 +11,7 @@ jobs:
     permissions:
       contents: write
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v6
 
       - name: Release
         env:
@@ -20,6 +20,6 @@ jobs:
           gh release delete latest --yes 2>/dev/null || true
           gh release create latest \
             --title latest \
-            --notes "" \
+            --generate-notes \
             bin/git-cd \
             install.sh
