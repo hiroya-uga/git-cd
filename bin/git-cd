@@ -1,0 +1,85 @@
+#!/usr/bin/env bash
+
+CACHE_FILE="${HOME}/.cache/git-cd"
+SEARCH_DIR="${HOME}"
+DEPTH=5
+INCLUDE_SUBMODULES=false
+USE_CACHE=false
+
+usage() {
+  cat >&2 <<EOF
+Usage: git cd [path] [options]
+
+Navigate to a git repository interactively.
+
+Options:
+  --depth <n>     Limit directory traversal depth (default: 5)
+  --submodules    Include git submodules in the list
+  --cache         Use cached results for faster startup (refreshes cache in background)
+  -h, --help      Show this help
+EOF
+}
+
+find_repos() {
+  if [ "$INCLUDE_SUBMODULES" = true ]; then
+    find "$SEARCH_DIR" -maxdepth "$DEPTH" -name ".git" 2>/dev/null | sed 's|/\.git$||'
+  else
+    find "$SEARCH_DIR" -maxdepth "$DEPTH" -name ".git" -type d 2>/dev/null | sed 's|/\.git$||'
+  fi
+}
+
+while [ $# -gt 0 ]; do
+  case "$1" in
+    --depth)
+      DEPTH="$2"
+      shift 2
+      ;;
+    --submodules)
+      INCLUDE_SUBMODULES=true
+      shift
+      ;;
+    --cache)
+      USE_CACHE=true
+      shift
+      ;;
+    -h|--help)
+      usage
+      exit 0
+      ;;
+    -*)
+      echo "Unknown option: $1" >&2
+      exit 1
+      ;;
+    *)
+      SEARCH_DIR="$1"
+      shift
+      ;;
+  esac
+done
+
+if [ "$USE_CACHE" = true ] && [ -f "$CACHE_FILE" ]; then
+  repos=$(cat "$CACHE_FILE")
+  find_repos > "$CACHE_FILE" 2>/dev/null &
+else
+  repos=$(find_repos)
+  mkdir -p "$(dirname "$CACHE_FILE")"
+  printf '%s\n' "$repos" > "$CACHE_FILE"
+fi
+
+if [ -z "$repos" ]; then
+  echo "No git repositories found under $SEARCH_DIR" >&2
+  exit 1
+fi
+
+if command -v fzf >/dev/null 2>&1; then
+  selected=$(printf '%s\n' "$repos" | fzf)
+else
+  printf '%s\n' "$repos" | cat -n >&2
+  printf 'Select a number: ' >&2
+  read -r num
+  selected=$(printf '%s\n' "$repos" | sed -n "${num}p")
+fi
+
+[ -z "$selected" ] && exit 1
+
+printf '%s\n' "$selected"
