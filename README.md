@@ -15,7 +15,7 @@ If [fzf](https://github.com/junegunn/fzf) is installed, it will be used for fuzz
 ### Arguments
 
 ```sh
-git cd [path]
+git cd [path] # git cd ./
 ```
 
 Specify a starting directory to search from. Defaults to `$HOME`.
