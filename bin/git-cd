@@ -21,10 +21,15 @@ EOF
 }
 
 find_repos() {
+  local prune_dirs=( -name "node_modules" -o -name "Library" -o -name ".Trash" )
   if [ "$INCLUDE_SUBMODULES" = true ]; then
-    find "$SEARCH_DIR" -maxdepth "$DEPTH" -name ".git" 2>/dev/null | sed 's|/\.git$||'
+    find "$SEARCH_DIR" -maxdepth "$DEPTH" \
+      \( "${prune_dirs[@]}" \) -prune \
+      -o -name ".git" -print 2>/dev/null | sed 's|/\.git$||'
   else
-    find "$SEARCH_DIR" -maxdepth "$DEPTH" -name ".git" -type d 2>/dev/null | sed 's|/\.git$||'
+    find "$SEARCH_DIR" -maxdepth "$DEPTH" \
+      \( "${prune_dirs[@]}" \) -prune \
+      -o -name ".git" -type d -print 2>/dev/null | sed 's|/\.git$||'
   fi
 }
 
