@@ -62,6 +62,9 @@ while [ $# -gt 0 ]; do
   esac
 done
 
+# If git alias forwarded the subcommand name 'cd' as the first argument, ignore it
+[ "$SEARCH_DIR" = "cd" ] && SEARCH_DIR="$HOME"
+
 if [ ! -d "$SEARCH_DIR" ]; then
   echo "Not a directory: $SEARCH_DIR" >&2
   exit 1

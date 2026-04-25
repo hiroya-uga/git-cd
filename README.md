@@ -27,6 +27,7 @@ Specify a starting directory to search from. Defaults to `$HOME`.
 | `--depth <n>`  | Limit directory traversal depth (default: 5)                              |
 | `--submodules` | Include git submodules in the list (excluded by default)                  |
 | `--cache`      | Use cached results for faster startup (refreshes cache in the background) |
+| `-h, --help`   | Show this help message                                                    |
 
 ## Caching
 
