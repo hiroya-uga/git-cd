@@ -16,7 +16,7 @@ Navigate to a git repository interactively.
 Options:
   --depth <n>     Limit directory traversal depth (default: 5)
   --submodules    Include git submodules in the list
-  --cache         Use cached results for faster startup (refreshes cache in background)
+  --cache         Use cached results for faster startup
   -h, --help      Show this help
 
 Configuration:
@@ -68,8 +68,7 @@ while [ $# -gt 0 ]; do
 done
 
 # If git alias forwarded the subcommand name 'cd' as the first argument, ignore it
-[ "$SEARCH_DIR" = "cd" ] && SEARCH_DIR="${_configured_root:-${HOME}}"
-
+[ "$SEARCH_DIR" = "cd" ] && [ ! -d "$SEARCH_DIR" ] && SEARCH_DIR="${_configured_root:-${HOME}}"
 if [ ! -d "$SEARCH_DIR" ]; then
   echo "Not a directory: $SEARCH_DIR" >&2
   exit 1
@@ -78,7 +77,6 @@ SEARCH_DIR="$(cd "$SEARCH_DIR" && pwd)"
 
 if [ "$USE_CACHE" = true ] && [ -f "$CACHE_FILE" ]; then
   repos=$(cat "$CACHE_FILE")
-  find_repos > "$CACHE_FILE" 2>/dev/null &
 else
   repos=$(find_repos)
   mkdir -p "$(dirname "$CACHE_FILE")"

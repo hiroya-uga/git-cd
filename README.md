@@ -26,7 +26,7 @@ Specify a starting directory to search from. Defaults to `$HOME`, or the value o
 | -------------- | ------------------------------------------------------------------------- |
 | `--depth <n>`  | Limit directory traversal depth (default: 5)                              |
 | `--submodules` | Include git submodules in the list (excluded by default)                  |
-| `--cache`      | Use cached results for faster startup (refreshes cache in the background) |
+| `--cache`      | Use cached results for faster startup                                      |
 | `-h, --help`   | Show this help message                                                    |
 
 ## Configuration
@@ -41,7 +41,7 @@ After this, `git cd` will search under `~/works` instead of `$HOME`. Passing an 
 
 ## Caching
 
-By default, repositories are searched fresh on every run. Pass `--cache` to use the cached list from the previous run instead — the cache is then refreshed in the background for next time.
+By default, repositories are searched fresh on every run and the latest result is written to the cache file. Pass `--cache` to reuse the current cached list as-is.
 
 The cache is stored at `~/.cache/git-cd`.
 
