@@ -41,6 +41,10 @@ find_repos() {
 while [ $# -gt 0 ]; do
   case "$1" in
     --depth)
+      if [ $# -lt 2 ]; then
+        echo "--depth requires a value" >&2
+        exit 1
+      fi
       DEPTH="$2"
       shift 2
       ;;

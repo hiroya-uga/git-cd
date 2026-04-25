@@ -112,6 +112,13 @@ assert_file_contains_exactly() {
 }
 
 # describe: help and argument validation
+@test "returns an error when --depth is given without a value" {
+  run_git_cd "$TEST_ROOT" --depth
+
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"--depth requires a value"* ]]
+}
+
 @test "returns usage text for --help" {
   run_git_cd --help
 
@@ -136,6 +143,18 @@ assert_file_contains_exactly() {
 
   [ "$status" -eq 0 ]
   [ "$output" = "$resolved_literal_root/cd" ]
+}
+
+@test "uses git-cd.root as default search path when configured" {
+  local configured_root="$RESOLVED_TEST_ROOT/configured-root"
+  local config_file="$TEST_ROOT/gitconfig"
+  mkdir -p "$configured_root/myrepo/.git"
+  printf '[git-cd]\n\troot = %s\n' "$configured_root" > "$config_file"
+
+  run env PATH="$TEST_ROOT/mock-bin:$ORIGINAL_PATH" HOME="$TEST_ROOT/home" FZF_CAPTURE="$FZF_CAPTURE" GIT_CONFIG_GLOBAL="$config_file" "$GIT_CD_SCRIPT"
+
+  [ "$status" -eq 0 ]
+  [ "$output" = "$configured_root/myrepo" ]
 }
 
 # describe: repository discovery

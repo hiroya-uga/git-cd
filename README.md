@@ -15,19 +15,19 @@ If [fzf](https://github.com/junegunn/fzf) is installed, it will be used for fuzz
 ### Arguments
 
 ```sh
-git cd [path] # git cd ./
+git cd [path] # e.g., git cd ./
 ```
 
 Specify a starting directory to search from. Defaults to `$HOME`, or the value of `git-cd.root` if configured (see below).
 
 ### Options
 
-| Option         | Description                                                               |
-| -------------- | ------------------------------------------------------------------------- |
-| `--depth <n>`  | Limit directory traversal depth (default: 5)                              |
-| `--submodules` | Include git submodules in the list (excluded by default)                  |
-| `--cache`      | Use cached results for faster startup                                      |
-| `-h, --help`   | Show this help message                                                    |
+| Option         | Description                                              |
+| -------------- | -------------------------------------------------------- |
+| `--depth <n>`  | Limit directory traversal depth (default: 5)             |
+| `--submodules` | Include git submodules in the list (excluded by default) |
+| `--cache`      | Use cached results for faster startup                    |
+| `-h, --help`   | Show this help message                                   |
 
 ## Configuration
 
