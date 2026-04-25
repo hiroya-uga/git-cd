@@ -18,7 +18,7 @@ If [fzf](https://github.com/junegunn/fzf) is installed, it will be used for fuzz
 git cd [path] # git cd ./
 ```
 
-Specify a starting directory to search from. Defaults to `$HOME`.
+Specify a starting directory to search from. Defaults to `$HOME`, or the value of `git-cd.root` if configured (see below).
 
 ### Options
 
@@ -28,6 +28,16 @@ Specify a starting directory to search from. Defaults to `$HOME`.
 | `--submodules` | Include git submodules in the list (excluded by default)                  |
 | `--cache`      | Use cached results for faster startup (refreshes cache in the background) |
 | `-h, --help`   | Show this help message                                                    |
+
+## Configuration
+
+You can set a default search root via git's global config — this avoids conflicts with other tools since it uses git's own config namespace:
+
+```sh
+git config --global git-cd.root ~/works
+```
+
+After this, `git cd` will search under `~/works` instead of `$HOME`. Passing an explicit path argument still overrides the configured value.
 
 ## Caching
 

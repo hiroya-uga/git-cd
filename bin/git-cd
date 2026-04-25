@@ -1,7 +1,8 @@
 #!/usr/bin/env bash
 
 CACHE_FILE="${HOME}/.cache/git-cd"
-SEARCH_DIR="${HOME}"
+_configured_root=$(git config --global --get git-cd.root 2>/dev/null)
+SEARCH_DIR="${_configured_root:-${HOME}}"
 DEPTH=5
 INCLUDE_SUBMODULES=false
 USE_CACHE=false
@@ -17,6 +18,10 @@ Options:
   --submodules    Include git submodules in the list
   --cache         Use cached results for faster startup (refreshes cache in background)
   -h, --help      Show this help
+
+Configuration:
+  git config --global git-cd.root <path>
+                  Set the default search directory (overrides \$HOME)
 EOF
 }
 
@@ -63,7 +68,7 @@ while [ $# -gt 0 ]; do
 done
 
 # If git alias forwarded the subcommand name 'cd' as the first argument, ignore it
-[ "$SEARCH_DIR" = "cd" ] && SEARCH_DIR="$HOME"
+[ "$SEARCH_DIR" = "cd" ] && SEARCH_DIR="${_configured_root:-${HOME}}"
 
 if [ ! -d "$SEARCH_DIR" ]; then
   echo "Not a directory: $SEARCH_DIR" >&2
