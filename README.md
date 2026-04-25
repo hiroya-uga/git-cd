@@ -61,7 +61,8 @@ git -C ~/.git-cd pull
 1. Places `git-cd` at `~/.local/bin/git-cd`
     - Clone install: creates a symlink to the cloned script
     - curl install: downloads the script directly
-2. Appends a shell function to `~/.zshrc` (or `~/.bashrc`)
+2. Adds `~/.local/bin` to `PATH` in `~/.zshrc` (or `~/.bashrc`) if not already present
+3. Appends a shell function to `~/.zshrc` (or `~/.bashrc`)
     - `git cd` is handled by this function so that `cd` runs in the current shell process — without it, directory changes would not persist after the command exits
 
 Open a new terminal tab and you're ready to go.
@@ -73,6 +74,8 @@ Open a new terminal tab and you're ready to go.
 ```sh
 rm ~/.local/bin/git-cd
 ```
+
+Then remove the shell function from `~/.zshrc` (or `~/.bashrc`) — delete the lines between `# git-cd` and the closing `}`.
 
 ### Clone install
 
@@ -86,4 +89,4 @@ Then remove the shell function from `~/.zshrc` (or `~/.bashrc`) — delete the l
 ## Requirements
 
 - bash or zsh
-- [fzf](https://github.com/junegunn/fzf) (optional, recommended)
+- [fzf](https://github.com/junegunn/fzf) (optional, recommended — install with `brew install fzf`)

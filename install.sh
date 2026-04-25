@@ -38,6 +38,12 @@ else
   RC_FILE="$HOME/.bashrc"
 fi
 
+# Add INSTALL_DIR to PATH in rc file if not already present
+if ! grep -q '\.local/bin' "$RC_FILE" 2>/dev/null; then
+  printf '\nexport PATH="$HOME/.local/bin:$PATH"\n' >> "$RC_FILE"
+  echo "Added $INSTALL_DIR to PATH in $RC_FILE"
+fi
+
 # Append shell function if not already present
 if grep -q "# git-cd" "$RC_FILE" 2>/dev/null; then
   echo "Shell function already exists in $RC_FILE"
@@ -49,3 +55,6 @@ fi
 echo ""
 echo "✅ Done!"
 echo "Open a new terminal tab to start using 'git cd'."
+echo ""
+echo "Tip: install fzf for a better experience:"
+echo "     brew install fzf"
