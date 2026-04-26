@@ -5,8 +5,11 @@ set -euo pipefail
 INSTALL_DIR="${HOME}/.local/bin"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 
-SHELL_FUNCTION='
-# git-cd: navigate to git repositories interactively
+INSTALL_DATE="$(date '+%Y-%m-%d %H:%M:%S')"
+SHELL_FUNCTION_HEAD="
+# git-cd BEGIN
+# Installed: $INSTALL_DATE"
+SHELL_FUNCTION_BODY='
 git() {
   if [ "${1:-}" = "cd" ]; then
     shift
@@ -15,7 +18,9 @@ git() {
   else
     command git "$@"
   fi
-}'
+}
+# git-cd END'
+SHELL_FUNCTION="${SHELL_FUNCTION_HEAD}${SHELL_FUNCTION_BODY}"
 
 if [ -f "$SCRIPT_DIR/bin/git-cd" ]; then
   # Clone install: create a symlink so `git pull` automatically reflects updates
@@ -44,9 +49,17 @@ if ! grep -q '\.local/bin' "$RC_FILE" 2>/dev/null; then
   echo "Added $INSTALL_DIR to PATH in $RC_FILE"
 fi
 
-# Append shell function if not already present
-if grep -q "# git-cd" "$RC_FILE" 2>/dev/null; then
-  echo "Shell function already exists in $RC_FILE"
+# Append or update shell function
+if grep -q "# git-cd BEGIN" "$RC_FILE" 2>/dev/null; then
+  _FUNC_FILE="$(mktemp)"
+  printf '%s' "$SHELL_FUNCTION" > "$_FUNC_FILE"
+  FUNC_FILE="$_FUNC_FILE" perl -i -0pe '
+    my $r = do { local $/; open(my $fh, "<", $ENV{FUNC_FILE}) or die; <$fh> };
+    $r =~ s/^\s*//;
+    s/# git-cd BEGIN.*?# git-cd END/$r/s;
+  ' "$RC_FILE"
+  rm -f "$_FUNC_FILE"
+  echo "Updated shell function in $RC_FILE"
 else
   printf '%s\n' "$SHELL_FUNCTION" >> "$RC_FILE"
   echo "Added shell function to $RC_FILE"

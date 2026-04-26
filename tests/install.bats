@@ -100,20 +100,29 @@ run_quick_install() {
 
 # describe: shell function setup
 
-@test "adds shell function to rc file" {
+@test "adds shell function with BEGIN/END markers to rc file" {
   run_install
 
   [ "$status" -eq 0 ]
-  grep -q 'git-cd' "$FAKE_HOME/.bashrc"
+  grep -q '# git-cd BEGIN' "$FAKE_HOME/.bashrc"
+  grep -q '# git-cd END' "$FAKE_HOME/.bashrc"
 }
 
-@test "does not add shell function when already present" {
-  printf '# git-cd: navigate to git repositories interactively\n' > "$FAKE_HOME/.bashrc"
+@test "adds Installed date comment to rc file" {
+  run_install
+
+  [ "$status" -eq 0 ]
+  grep -q '# Installed:' "$FAKE_HOME/.bashrc"
+}
+
+@test "updates shell function when already present" {
+  printf '# git-cd BEGIN\n# Installed: 2000-01-01 00:00:00\ngit() { : ; }\n# git-cd END\n' > "$FAKE_HOME/.bashrc"
 
   run_install
 
   [ "$status" -eq 0 ]
-  [ "$(grep -c '# git-cd' "$FAKE_HOME/.bashrc")" -eq 1 ]
+  [ "$(grep -c '# git-cd BEGIN' "$FAKE_HOME/.bashrc")" -eq 1 ]
+  ! grep -q '# Installed: 2000-01-01 00:00:00' "$FAKE_HOME/.bashrc"
 }
 
 @test "added shell function forwards args to git-cd" {
@@ -133,6 +142,7 @@ run_quick_install() {
 }
 
 @test "writes to .zshrc when SHELL is zsh" {
+  unset ZDOTDIR
   run env HOME="$FAKE_HOME" SHELL="/bin/zsh" PATH="$MOCK_BIN:$PATH" bash "$INSTALL_SH"
 
   [ "$status" -eq 0 ]
