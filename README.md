@@ -2,6 +2,8 @@
 
 Navigate to git repositories interactively from the command line.
 
+> For Windows PowerShell, see [README-WIN.md](README-WIN.md).
+
 ## Usage
 
 ```sh
