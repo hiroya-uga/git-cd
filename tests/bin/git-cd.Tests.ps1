@@ -284,8 +284,8 @@ pwsh -NoProfile -File "%~dp0fzf.ps1"
         }
     }
 
-    Context 'submodule handling' {
-        It 'excludes submodules by default' {
+    Context 'nested repository handling' {
+        It 'excludes nested gitfile repositories by default' {
             $submoduleOnly = Join-Path $TestRoot 'submodule-only'
             New-Item -ItemType Directory -Force -Path (Join-Path $submoduleOnly 'sub') | Out-Null
             'gitdir: ../.git/modules/sub' | Set-Content -Path (Join-Path $submoduleOnly 'sub/.git') -NoNewline
@@ -296,18 +296,18 @@ pwsh -NoProfile -File "%~dp0fzf.ps1"
             $result.Stderr | Should -Match 'No git repositories found under'
         }
 
-        It 'includes submodules when --submodules is enabled' {
+        It 'includes nested gitfile repositories when --nested is enabled' {
             $submoduleOnly = Join-Path $TestRoot 'submodule-only'
             New-Item -ItemType Directory -Force -Path (Join-Path $submoduleOnly 'sub') | Out-Null
             'gitdir: ../.git/modules/sub' | Set-Content -Path (Join-Path $submoduleOnly 'sub/.git') -NoNewline
 
-            $result = Invoke-GitCdPs1 -TestRoot $TestRoot -Arguments @($submoduleOnly, '--submodules')
+            $result = Invoke-GitCdPs1 -TestRoot $TestRoot -Arguments @($submoduleOnly, '--nested')
 
             $result.Status | Should -Be 0
             $result.Stdout | Should -Be (Join-Path $submoduleOnly 'sub')
         }
 
-        It 'recurses into repositories to find nested submodules when --submodules is enabled' {
+        It 'recurses into repositories to find nested gitfile repositories when --nested is enabled' {
             $deepParent = Join-Path $TestRoot 'deep-parent'
             New-Item -ItemType Directory -Force -Path (Join-Path $deepParent '.git') | Out-Null
             New-Item -ItemType Directory -Force -Path (Join-Path $deepParent 'a/b/sub') | Out-Null
@@ -317,14 +317,14 @@ pwsh -NoProfile -File "%~dp0fzf.ps1"
                 (Join-Path $deepParent 'a/b/sub')
             )
 
-            $result = Invoke-GitCdPs1 -TestRoot $TestRoot -Arguments @($TestRoot, '--submodules')
+            $result = Invoke-GitCdPs1 -TestRoot $TestRoot -Arguments @($TestRoot, '--nested')
 
             $result.Status | Should -Be 0
             $result.Stdout | Should -BeIn $expected
             $result.Stdout | Should -Not -Match 'node_modules'
         }
 
-        It 'limits discovery when path, --submodules, and --depth are combined' {
+        It 'limits discovery when path, --nested, and --depth are combined' {
             $scopedRoot = Join-Path $TestRoot 'scoped-submodules'
             New-Item -ItemType Directory -Force -Path (Join-Path $scopedRoot 'parent/.git') | Out-Null
             New-Item -ItemType Directory -Force -Path (Join-Path $scopedRoot 'parent/sub') | Out-Null
@@ -337,7 +337,7 @@ pwsh -NoProfile -File "%~dp0fzf.ps1"
                 (Join-Path $scopedRoot 'parent/components/vendor')
             )
 
-            $result = Invoke-GitCdPs1 -TestRoot $TestRoot -Arguments @($scopedRoot, '--submodules', '--depth', '3')
+            $result = Invoke-GitCdPs1 -TestRoot $TestRoot -Arguments @($scopedRoot, '--nested', '--depth', '3')
 
             $result.Status | Should -Be 0
             $result.CandidateList | Should -Contain (Join-Path $scopedRoot 'parent')

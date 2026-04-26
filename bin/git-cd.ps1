@@ -1,5 +1,5 @@
 $Depth = 5
-$Submodules = $false
+$Nested = $false
 $Cache = $false
 $CacheFile = Join-Path $env:LOCALAPPDATA "git-cd\cache"
 
@@ -30,7 +30,7 @@ function Show-Usage {
     Write-Host ""
     Write-Host "Options:"
     Write-Host "  --depth <n>     Limit directory traversal depth (default: 5)"
-    Write-Host "  --submodules    Include git submodules in the list"
+    Write-Host "  --nested        Include nested repositories"
     Write-Host "  --cache         Use cached results for faster startup"
     Write-Host "  -h, --help      Show this help"
     Write-Host ""
@@ -49,7 +49,7 @@ while ($i -lt $args.Count) {
             $Depth = [int]$args[++$i]
             break
         }
-        '--submodules' { $Submodules = $true; break }
+        '--nested'     { $Nested = $true; break }
         '--cache'      { $Cache = $true; break }
         '--help'       { Show-Usage; exit 0 }
         '-h'           { Show-Usage; exit 0 }
@@ -75,14 +75,14 @@ $SearchPath = (Resolve-Path $SearchPath).Path
 $SkipDirs = @('node_modules', '.git', 'AppData', '$RECYCLE.BIN', 'System Volume Information')
 
 $SearchBlock = {
-    param([string]$Root, [int]$MaxDepth, [bool]$IncludeSubmodules, [string[]]$Skip)
+    param([string]$Root, [int]$MaxDepth, [bool]$IncludeNested, [string[]]$Skip)
 
     function Search([string]$Path, [int]$Depth) {
         $gitPath = Join-Path $Path '.git'
         $isRepo = Test-Path $gitPath -ErrorAction SilentlyContinue
         $isDir  = $isRepo -and (Test-Path $gitPath -PathType Container -ErrorAction SilentlyContinue)
 
-        if ($isRepo -and ($IncludeSubmodules -or $isDir)) {
+        if ($isRepo -and ($IncludeNested -or $isDir)) {
             $Path
         }
 
@@ -97,7 +97,7 @@ $SearchBlock = {
 }
 
 function Find-Repos {
-    & $SearchBlock $SearchPath $Depth $Submodules $SkipDirs
+    & $SearchBlock $SearchPath $Depth $Nested $SkipDirs
 }
 
 # Get repo list

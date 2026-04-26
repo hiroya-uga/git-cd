@@ -30,12 +30,12 @@ Specify a starting directory to search from. By default, git-cd uses:
 
 ### Options
 
-| Option         | Description                                              |
-| -------------- | -------------------------------------------------------- |
-| `--depth <n>`  | Limit directory traversal depth (default: 5)             |
-| `--submodules` | Include git submodules in the list (excluded by default) |
-| `--cache`      | Use cached results for faster startup                    |
-| `-h, --help`   | Show this help message                                   |
+| Option        | Description                                    |
+| ------------- | ---------------------------------------------- |
+| `--depth <n>` | Limit directory traversal depth (default: 5)   |
+| `--nested`    | Include nested repositories such as submodules |
+| `--cache`     | Use cached results for faster startup          |
+| `-h, --help`  | Show this help message                         |
 
 ## Configuration
 
@@ -51,10 +51,10 @@ After this, `git cd` will search under `~/works` instead of your home directory.
 
 By default, repositories are searched fresh on every run and the latest result is written to the cache file. Pass `--cache` to reuse the current cached list as-is.
 
-| Platform        | Cache file                      |
-| --------------- | ------------------------------- |
-| Bash / Zsh      | `~/.cache/git-cd`               |
-| PowerShell      | `%LOCALAPPDATA%\git-cd\cache`   |
+| Platform   | Cache file                    |
+| ---------- | ----------------------------- |
+| Bash / Zsh | `~/.cache/git-cd`             |
+| PowerShell | `%LOCALAPPDATA%\git-cd\cache` |
 
 ## Contributing
 
