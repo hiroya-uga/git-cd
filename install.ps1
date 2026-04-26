@@ -12,6 +12,7 @@ $HasLocalScripts = $ScriptDir -and
     (Test-Path (Join-Path $ScriptDir "bin\git-cd.ps1")) -and
     (Test-Path (Join-Path $ScriptDir "bin\git-cd.cmd"))
 
+$InstallDate = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
 $ShellFunction = @'
 
 # git-cd BEGIN
@@ -26,6 +27,7 @@ function git {
 }
 # git-cd END
 '@
+$ShellFunction = $ShellFunction -replace '# git-cd BEGIN', "# git-cd BEGIN`n# Installed: $InstallDate"
 
 # Place git-cd.ps1
 New-Item -ItemType Directory -Force -Path $InstallDir | Out-Null
@@ -71,7 +73,7 @@ if ($profileContent -notlike "*# git-cd BEGIN*") {
 }
 
 Write-Host ""
-Write-Host "✅ Done!"
+Write-Host "[ Done! ]"
 Write-Host "Open a new terminal to start using 'git cd'."
 Write-Host ""
 Write-Host "Tip: install fzf for a better experience:"

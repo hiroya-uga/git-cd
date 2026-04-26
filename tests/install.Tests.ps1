@@ -162,6 +162,7 @@ function global:Invoke-WebRequest {
 
             $content = Get-Content $result.Profile -Raw
             $content | Should -Match '# git-cd BEGIN'
+            $content | Should -Match '# Installed:'
             $content | Should -Match 'function git'
             $content | Should -Match '# git-cd END'
         }
@@ -191,6 +192,7 @@ function git {
 
             $result.Status | Should -Be 0
             $content = Get-Content $result.Profile -Raw
+            $content | Should -Match '# Installed:'
             $content | Should -Match ([regex]::Escape('@(if ($args.Length -gt 1)'))
             $content | Should -Not -Match ([regex]::Escape('$rest = if ($args.Length -gt 1) { $args['))
         }
@@ -201,6 +203,7 @@ function git {
 
             $content = Get-Content (Join-Path $TestRoot 'ps-profile.ps1') -Raw
             ([regex]::Matches($content, '# git-cd BEGIN')).Count | Should -Be 1
+            ([regex]::Matches($content, '# Installed:')).Count | Should -Be 1
         }
     }
 }
