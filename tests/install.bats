@@ -160,3 +160,15 @@ run_quick_install() {
   [ -f "$zdotdir/.zshrc" ]
   grep -q 'git-cd' "$zdotdir/.zshrc"
 }
+
+@test "completion message suggests a platform-appropriate fzf install hint" {
+  run_install
+
+  [ "$status" -eq 0 ]
+
+  if [ "$(uname -s)" = "Darwin" ]; then
+    [[ "$output" == *"macOS (Homebrew): brew install fzf"* ]]
+  else
+    [[ "$output" == *"Linux: install it with your package manager"* ]]
+  fi
+}

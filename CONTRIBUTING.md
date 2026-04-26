@@ -1,5 +1,23 @@
 # CONTRIBUTING
 
+## Scope
+
+This project ships the same user-facing command across two implementations:
+
+- Bash / Zsh: `install.sh`, `bin/git-cd`
+- PowerShell / Windows: `install.ps1`, `bin/git-cd.ps1`, `bin/git-cd.cmd`
+
+Please keep behavior aligned unless a platform-specific difference is intentional and documented.
+
+User-facing docs live at the repository root (`README.md`, `BASH.md`, `POWERSHELL.md`). Implementation-oriented notes live under [`docs/`](docs/) so contributor-only details stay out of the main user flow.
+
+## When Making Changes
+
+- Update both implementations when changing shared behavior.
+- Update both test suites when changing a shared scenario.
+- Update user-facing docs when options, install steps, defaults, or platform behavior change.
+- Document intentional platform-specific differences in the implementation reference.
+
 ## Test
 
 This project currently uses:
@@ -15,6 +33,12 @@ Install `bats` if needed:
 
 ```sh
 brew install bats-core
+```
+
+On Linux, install `bats` using your package manager. For example:
+
+```sh
+sudo apt install bats
 ```
 
 Run the bash tests:
@@ -53,11 +77,15 @@ GitHub Actions runs:
 
 - `.github/workflows/test.yml`
 
+## Reference Docs
+
+- Bash / PowerShell implementation reference: [docs/implementation-reference.md](docs/implementation-reference.md)
+
 ## Test Parity
 
 `bats` and `Pester` are intended to cover the same user-facing scenarios.
 
-The current shared scenarios are:
+The following scenarios are covered by both test suites:
 
 | Scenario                                                 | Bash (`bats`) | PowerShell (`Pester`) |
 | -------------------------------------------------------- | ------------- | --------------------- |
@@ -72,8 +100,6 @@ The current shared scenarios are:
 | Repository discovery from path                           | Yes           | Yes                   |
 | Depth limit excludes deeper repos                        | Yes           | Yes                   |
 | `node_modules` directories are skipped                   | Yes           | Yes                   |
-| macOS-specific ignored directories are skipped           | Yes           | No                    |
-| Windows-specific ignored directories are skipped         | No            | Yes                   |
 | Depth limit excludes all repos                           | Yes           | Yes                   |
 | Depth limit includes deep repo when sufficient           | Yes           | Yes                   |
 | Path + `--depth` combined                                | Yes           | Yes                   |
@@ -83,6 +109,13 @@ The current shared scenarios are:
 | Nested submodule recursion with `--submodules`           | Yes           | Yes                   |
 | Path + `--submodules` + `--depth` combined               | Yes           | Yes                   |
 | Search stays inside the specified subtree                | Yes           | Yes                   |
+
+The following scenarios are intentionally platform-specific and covered by one test suite only:
+
+| Scenario                                         | Covered by      | Reason                                      |
+| ------------------------------------------------ | --------------- | ------------------------------------------- |
+| macOS-specific ignored directories are skipped   | Bash only       | `Library` / `.Trash` are macOS-only paths   |
+| Windows-specific ignored directories are skipped | PowerShell only | `AppData` / `$RECYCLE.BIN` are Windows-only |
 
 Some assertion details are allowed to differ between the two test suites:
 
@@ -100,3 +133,9 @@ When adding or changing an install scenario, update both:
 
 - `tests/install.bats`
 - `tests/install.Tests.ps1`
+
+## Pull Requests
+
+- Summarize any user-visible behavior changes.
+- Call out platform-specific decisions when Bash and PowerShell differ.
+- Mention which docs were updated, or explicitly note that no doc changes were needed.
