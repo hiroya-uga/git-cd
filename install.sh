@@ -70,4 +70,8 @@ echo "✅ Done!"
 echo "Open a new terminal tab to start using 'git cd'."
 echo ""
 echo "Tip: install fzf for a better experience:"
-echo "     brew install fzf"
+if [ "$(uname -s)" = "Darwin" ]; then
+  echo "     macOS (Homebrew): brew install fzf"
+else
+  echo "     Linux: install it with your package manager"
+fi
