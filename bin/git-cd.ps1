@@ -30,7 +30,7 @@ function Show-Usage {
     Write-Host ""
     Write-Host "Options:"
     Write-Host "  --depth <n>     Limit directory traversal depth (default: 5)"
-    Write-Host "  --nested        Include nested repositories such as submodules"
+    Write-Host "  --nested        Include nested repositories"
     Write-Host "  --cache         Use cached results for faster startup"
     Write-Host "  -h, --help      Show this help"
     Write-Host ""

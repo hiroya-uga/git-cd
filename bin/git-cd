@@ -15,7 +15,7 @@ Navigate to a git repository interactively.
 
 Options:
   --depth <n>     Limit directory traversal depth (default: 5)
-  --nested        Include nested repositories such as submodules
+  --nested        Include nested repositories
   --cache         Use cached results for faster startup
   -h, --help      Show this help
 
