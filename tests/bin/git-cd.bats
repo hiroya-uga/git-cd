@@ -253,8 +253,8 @@ assert_file_contains_exactly() {
   ! grep -Fqx "$fresh_repo" "$CACHE_FILE"
 }
 
-# describe: submodule handling
-@test "excludes submodules by default" {
+# describe: nested repository handling
+@test "excludes nested gitfile repositories by default" {
   local submodule_only="$TEST_ROOT/submodule-only"
   mkdir -p "$submodule_only/sub"
   printf 'gitdir: ../.git/modules/sub\n' > "$submodule_only/sub/.git"
@@ -265,20 +265,20 @@ assert_file_contains_exactly() {
   [[ "$output" == *"No git repositories found under"* ]]
 }
 
-@test "includes submodules when --submodules is enabled" {
+@test "includes nested gitfile repositories when --nested is enabled" {
   local submodule_only="$TEST_ROOT/submodule-only"
   local resolved_submodule_only
   mkdir -p "$submodule_only/sub"
   printf 'gitdir: ../.git/modules/sub\n' > "$submodule_only/sub/.git"
   resolved_submodule_only="$(cd "$submodule_only" && pwd)"
 
-  run_git_cd "$submodule_only" --submodules
+  run_git_cd "$submodule_only" --nested
 
   [ "$status" -eq 0 ]
   [ "$output" = "$resolved_submodule_only/sub" ]
 }
 
-@test "recurses into repositories to find nested submodules when --submodules is enabled" {
+@test "recurses into repositories to find nested gitfile repositories when --nested is enabled" {
   local isolated_root="$TEST_ROOT/submodule-recursion"
   local deep_parent="$isolated_root/deep-parent"
   local resolved_deep_parent
@@ -287,14 +287,14 @@ assert_file_contains_exactly() {
   printf 'gitdir: ../.git/modules/sub\n' > "$deep_parent/a/b/sub/.git"
   resolved_deep_parent="$(cd "$deep_parent" && pwd)"
 
-  run_git_cd "$isolated_root" --submodules
+  run_git_cd "$isolated_root" --nested
 
   [ "$status" -eq 0 ]
   [[ "$output" != *"node_modules"* ]]
   [[ "$output" == "$resolved_deep_parent" || "$output" == "$resolved_deep_parent/a/b/sub" ]]
 }
 
-@test "limits discovery when path, --submodules, and --depth are combined" {
+@test "limits discovery when path, --nested, and --depth are combined" {
   local scoped_root="$TEST_ROOT/scoped-submodules"
   local resolved_scoped_root
   mkdir -p "$scoped_root/parent/.git"
@@ -304,7 +304,7 @@ assert_file_contains_exactly() {
   printf 'gitdir: ../.git/modules/vendor\n' > "$scoped_root/parent/components/vendor/.git"
   resolved_scoped_root="$(cd "$scoped_root" && pwd)"
 
-  run_git_cd "$scoped_root" --submodules --depth 3
+  run_git_cd "$scoped_root" --nested --depth 3
 
   [ "$status" -eq 0 ]
   assert_capture_contains "$resolved_scoped_root/parent"

@@ -104,10 +104,10 @@ The following scenarios are covered by both test suites:
 | Depth limit includes deep repo when sufficient           | Yes           | Yes                   |
 | Path + `--depth` combined                                | Yes           | Yes                   |
 | `--cache` reuses the existing cache without rewriting it | Yes           | Yes                   |
-| Submodules excluded by default                           | Yes           | Yes                   |
-| Submodules included with `--submodules`                  | Yes           | Yes                   |
-| Nested submodule recursion with `--submodules`           | Yes           | Yes                   |
-| Path + `--submodules` + `--depth` combined               | Yes           | Yes                   |
+| Nested gitfile repos excluded by default                 | Yes           | Yes                   |
+| Nested gitfile repos included with `--nested`            | Yes           | Yes                   |
+| Nested gitfile repo recursion with `--nested`            | Yes           | Yes                   |
+| Path + `--nested` + `--depth` combined                   | Yes           | Yes                   |
 | Search stays inside the specified subtree                | Yes           | Yes                   |
 
 The following scenarios are intentionally platform-specific and covered by one test suite only:
