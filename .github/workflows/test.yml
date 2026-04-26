@@ -32,3 +32,18 @@ jobs:
         run: |
           bats tests/bin/git-cd.bats
           bats tests/install.bats
+
+  pester:
+    runs-on: windows-latest
+
+    steps:
+      - uses: actions/checkout@v6
+
+      - name: Install Pester
+        shell: pwsh
+        run: Install-Module -Name Pester -Scope CurrentUser -Force
+
+      - name: Run Pester tests
+        shell: pwsh
+        run: |
+          Invoke-Pester -CI -Path tests/bin/git-cd.Tests.ps1, tests/install.Tests.ps1

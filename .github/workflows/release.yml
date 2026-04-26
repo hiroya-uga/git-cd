@@ -21,5 +21,8 @@ jobs:
           gh release create latest \
             --title latest \
             --notes "See README for usage: https://github.com/hiroya-uga/git-cd#readme" \
+            bin/git-cd.ps1 \
+            bin/git-cd.cmd \
+            install.ps1 \
             bin/git-cd \
             install.sh
