@@ -29,4 +29,6 @@ jobs:
         run: brew install bats-core
 
       - name: Run bats tests
-        run: bats bin/__tests__/git-cd.bats
+        run: |
+          bats tests/bin/git-cd.bats
+          bats tests/install.bats

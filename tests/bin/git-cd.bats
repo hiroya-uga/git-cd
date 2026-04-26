@@ -4,7 +4,7 @@
 setup() {
   TEST_ROOT="$(mktemp -d "${TMPDIR:-/tmp}/git-cd-bats.XXXXXX")"
   RESOLVED_TEST_ROOT="$(cd "$TEST_ROOT" && pwd)"
-  GIT_CD_SCRIPT="$(cd "$(dirname "$BATS_TEST_FILENAME")/.." && pwd)/git-cd"
+  GIT_CD_SCRIPT="$(cd "$(dirname "$BATS_TEST_FILENAME")/../.." && pwd)/bin/git-cd"
   ORIGINAL_PATH="$PATH"
   FZF_CAPTURE="$TEST_ROOT/fzf-input.txt"
   CACHE_FILE="$TEST_ROOT/home/.cache/git-cd"
