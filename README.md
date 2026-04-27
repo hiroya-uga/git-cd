@@ -30,12 +30,12 @@ Specify a starting directory to search from. By default, git-cd uses:
 
 ### Options
 
-| Option        | Description                                    |
-| ------------- | ---------------------------------------------- |
-| `--depth <n>` | Limit directory traversal depth (default: 5)   |
-| `--nested`    | Include nested repositories such as submodules |
-| `--cache`     | Use cached results for faster startup          |
-| `-h, --help`  | Show this help message                         |
+| Option        | Description                                  |
+| ------------- | -------------------------------------------- |
+| `--depth <n>` | Limit directory traversal depth (default: 5) |
+| `--nested`    | Include nested repositories                  |
+| `--cache`     | Use cached results for faster startup        |
+| `-h, --help`  | Show this help message                       |
 
 ## Configuration
 
