@@ -29,16 +29,18 @@ teardown() {
 
 run_install() {
   local shell="${1:-/bin/bash}"
-  run env HOME="$FAKE_HOME" SHELL="$shell" PATH="$MOCK_BIN:$PATH" bash "$INSTALL_SH"
+  shift || true
+  run env HOME="$FAKE_HOME" SHELL="$shell" PATH="$MOCK_BIN:$PATH" bash "$INSTALL_SH" "$@"
 }
 
 # Run a copy of install.sh placed in an isolated dir (no bin/git-cd) to trigger the curl path
 run_quick_install() {
   local shell="${1:-/bin/bash}"
+  shift || true
   local dir="$TEST_ROOT/quick"
   mkdir -p "$dir"
   cp "$INSTALL_SH" "$dir/install.sh"
-  run env HOME="$FAKE_HOME" SHELL="$shell" PATH="$MOCK_BIN:$PATH" bash "$dir/install.sh"
+  run env HOME="$FAKE_HOME" SHELL="$shell" PATH="$MOCK_BIN:$PATH" bash "$dir/install.sh" "$@"
 }
 
 # describe: clone install
@@ -159,6 +161,36 @@ run_quick_install() {
   [ "$status" -eq 0 ]
   [ -f "$zdotdir/.zshrc" ]
   grep -q 'git-cd' "$zdotdir/.zshrc"
+}
+
+@test "writes to .zshrc.local when --zshrc-local is passed" {
+  run_install /bin/zsh --zshrc-local
+
+  [ "$status" -eq 0 ]
+  [ -f "$FAKE_HOME/.zshrc.local" ]
+  grep -q 'git-cd' "$FAKE_HOME/.zshrc.local"
+  [ ! -e "$FAKE_HOME/.zshrc" ]
+}
+
+@test "writes to .zshrc.local when -zl is passed" {
+  run_install /bin/zsh -zl
+
+  [ "$status" -eq 0 ]
+  [ -f "$FAKE_HOME/.zshrc.local" ]
+  grep -q 'git-cd' "$FAKE_HOME/.zshrc.local"
+  [ ! -e "$FAKE_HOME/.zshrc" ]
+}
+
+@test "writes to ZDOTDIR/.zshrc.local when ZDOTDIR is set and --zshrc-local is passed" {
+  local zdotdir="$FAKE_HOME/zdotdir"
+  mkdir -p "$zdotdir"
+
+  run env HOME="$FAKE_HOME" SHELL="/bin/zsh" ZDOTDIR="$zdotdir" PATH="$MOCK_BIN:$PATH" bash "$INSTALL_SH" --zshrc-local
+
+  [ "$status" -eq 0 ]
+  [ -f "$zdotdir/.zshrc.local" ]
+  grep -q 'git-cd' "$zdotdir/.zshrc.local"
+  [ ! -e "$zdotdir/.zshrc" ]
 }
 
 @test "completion message suggests a platform-appropriate fzf install hint" {

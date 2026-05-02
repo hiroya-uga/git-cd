@@ -15,6 +15,16 @@ git clone https://github.com/hiroya-uga/git-cd.git ~/.git-cd
 ~/.git-cd/install.sh
 ```
 
+If you prefer to keep shell customizations in `~/.zshrc.local`, install with:
+
+```sh
+~/.git-cd/install.sh -zl
+```
+
+Make sure your `~/.zshrc` sources `~/.zshrc.local` on startup.
+
+`--zshrc-local` is also available as the long form.
+
 To update:
 
 ```sh
@@ -29,13 +39,21 @@ git -C ~/.git-cd pull
 curl -fsSL https://github.com/hiroya-uga/git-cd/releases/latest/download/install.sh | bash
 ```
 
+To target `~/.zshrc.local` instead:
+
+```sh
+curl -fsSL https://github.com/hiroya-uga/git-cd/releases/latest/download/install.sh | bash -s -- -zl
+```
+
 ### What `install.sh` does
 
 1. Places `git-cd` at `~/.local/bin/git-cd`
     - Clone install: creates a symlink to the cloned script
     - Quick install: downloads the script directly
-2. Adds `~/.local/bin` to `PATH` in `~/.zshrc` (or `~/.bashrc`) if not already present
-3. Appends a shell function to `~/.zshrc` (or `~/.bashrc`)
+2. Adds `~/.local/bin` to `PATH` in the selected rc file
+    - Default: `~/.zshrc` for zsh, `~/.bashrc` for bash
+    - With `-zl` / `--zshrc-local`: `${ZDOTDIR:-$HOME}/.zshrc.local`
+3. Appends a shell function to the same rc file
     - `git cd` is handled by this function so that `cd` runs in the current shell process — without it, directory changes would not persist after the command exits
 
 Open a new terminal tab and you're ready to go.
@@ -57,7 +75,7 @@ rm -rf ~/.git-cd  # adjust this path if you cloned to a different location
 rm ~/.local/bin/git-cd
 ```
 
-After removing the installed script (and the cloned repository, if applicable), remove the shell function from `~/.zshrc` (or `~/.bashrc`) — delete the lines between `# git-cd BEGIN` and `# git-cd END`.
+After removing the installed script (and the cloned repository, if applicable), remove the shell function from the rc file you installed into (`~/.zshrc`, `~/.zshrc.local`, or `~/.bashrc`) — delete the lines between `# git-cd BEGIN` and `# git-cd END`.
 
 If the installer added `~/.local/bin` to `PATH`, also remove the `export PATH="$HOME/.local/bin:$PATH"` line from the same file.
 
@@ -65,15 +83,17 @@ If the installer added `~/.local/bin` to `PATH`, also remove the `export PATH="$
 
 ### `git cd` is not found after installation
 
-The installer updates `~/.zshrc` or `~/.bashrc`, but the change only takes effect in new shell sessions. Open a new terminal tab, or reload the rc file manually:
+The installer updates your selected rc file, but the change only takes effect in new shell sessions. Open a new terminal tab, or reload the rc file manually:
 
 ```sh
-source ~/.zshrc  # or ~/.bashrc
+source ~/.zshrc  # or ~/.zshrc.local / ~/.bashrc
 ```
 
 ### Which rc file was updated?
 
-The installer checks the basename of `$SHELL`. If it is `zsh`, it updates `${ZDOTDIR:-$HOME}/.zshrc`; otherwise it updates `~/.bashrc`.
+By default, the installer checks the basename of `$SHELL`. If it is `zsh`, it updates `${ZDOTDIR:-$HOME}/.zshrc`; otherwise it updates `~/.bashrc`.
+
+If you pass `-zl` or `--zshrc-local`, it updates `${ZDOTDIR:-$HOME}/.zshrc.local` instead.
 
 ### Directory change does not persist after `git cd`
 
