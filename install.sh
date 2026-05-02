@@ -4,6 +4,7 @@ set -euo pipefail
 
 INSTALL_DIR="${HOME}/.local/bin"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+ZSH_RC_BASENAME=".zshrc"
 
 INSTALL_DATE="$(date '+%Y-%m-%d %H:%M:%S')"
 SHELL_FUNCTION_HEAD="
@@ -22,6 +23,34 @@ git() {
 # git-cd END'
 SHELL_FUNCTION="${SHELL_FUNCTION_HEAD}${SHELL_FUNCTION_BODY}"
 
+show_help() {
+  cat <<'EOF'
+Usage: install.sh [options]
+
+Options:
+  -zl, --zshrc-local  Install shell setup into ${ZDOTDIR:-$HOME}/.zshrc.local
+  -h,  --help         Show this help message
+EOF
+}
+
+while [ "$#" -gt 0 ]; do
+  case "$1" in
+    -zl|--zshrc-local)
+      ZSH_RC_BASENAME=".zshrc.local"
+      ;;
+    -h|--help)
+      show_help
+      exit 0
+      ;;
+    *)
+      echo "Unknown option: $1" >&2
+      show_help >&2
+      exit 1
+      ;;
+  esac
+  shift
+done
+
 if [ -f "$SCRIPT_DIR/bin/git-cd" ]; then
   # Clone install: create a symlink so `git pull` automatically reflects updates
   mkdir -p "$INSTALL_DIR"
@@ -37,8 +66,10 @@ else
 fi
 
 # Determine rc file
-if [ "$(basename "${SHELL:-}")" = "zsh" ]; then
-  RC_FILE="${ZDOTDIR:-$HOME}/.zshrc"
+if [ "$ZSH_RC_BASENAME" = ".zshrc.local" ]; then
+  RC_FILE="${ZDOTDIR:-$HOME}/$ZSH_RC_BASENAME"
+elif [ "$(basename "${SHELL:-}")" = "zsh" ]; then
+  RC_FILE="${ZDOTDIR:-$HOME}/$ZSH_RC_BASENAME"
 else
   RC_FILE="$HOME/.bashrc"
 fi
@@ -68,6 +99,9 @@ fi
 echo ""
 echo "✅ Done!"
 echo "Open a new terminal tab to start using 'git cd'."
+if [ "$ZSH_RC_BASENAME" = ".zshrc.local" ]; then
+  echo "Make sure ${ZDOTDIR:-$HOME}/.zshrc sources $RC_FILE on startup."
+fi
 echo ""
 echo "Tip: install fzf for a better experience:"
 if [ "$(uname -s)" = "Darwin" ]; then
