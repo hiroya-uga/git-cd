@@ -100,37 +100,28 @@ run_quick_install() {
   [ "$(grep -c '.local/bin' "$FAKE_HOME/.bashrc")" -eq 1 ]
 }
 
-# describe: shell function setup
+# describe: shell hook setup
 
-@test "adds shell function with BEGIN/END markers to rc file" {
+@test "adds hook line to rc file" {
   run_install
 
   [ "$status" -eq 0 ]
-  grep -q '# git-cd BEGIN' "$FAKE_HOME/.bashrc"
-  grep -q '# git-cd END' "$FAKE_HOME/.bashrc"
+  grep -q '# git-cd' "$FAKE_HOME/.bashrc"
 }
 
-@test "adds Installed date comment to rc file" {
+@test "hook line evaluates git-cd init for the detected shell" {
   run_install
 
-  [ "$status" -eq 0 ]
-  grep -q '# Installed:' "$FAKE_HOME/.bashrc"
+  grep -q 'eval "\$(git-cd init bash)" # git-cd' "$FAKE_HOME/.bashrc"
 }
 
-@test "updates shell function when already present" {
-  printf '# git-cd BEGIN\n# Installed: 2000-01-01 00:00:00\ngit() { : ; }\n# git-cd END\n' > "$FAKE_HOME/.bashrc"
+@test "does not duplicate hook line when already present" {
+  printf 'eval "$(git-cd init bash)" # git-cd\n' > "$FAKE_HOME/.bashrc"
 
   run_install
 
   [ "$status" -eq 0 ]
-  [ "$(grep -c '# git-cd BEGIN' "$FAKE_HOME/.bashrc")" -eq 1 ]
-  ! grep -q '# Installed: 2000-01-01 00:00:00' "$FAKE_HOME/.bashrc"
-}
-
-@test "added shell function forwards args to git-cd" {
-  run_install
-
-  grep -q 'command git-cd' "$FAKE_HOME/.bashrc"
+  [ "$(grep -c '# git-cd' "$FAKE_HOME/.bashrc")" -eq 1 ]
 }
 
 # describe: shell detection
