@@ -3,6 +3,7 @@
 CACHE_FILE="${HOME}/.cache/git-cd"
 _configured_root=$(git config --global --get git-cd.root 2>/dev/null)
 SEARCH_DIR="${_configured_root:-${HOME}}"
+SEARCH_DIR_SET=false
 DEPTH=5
 INCLUDE_NESTED=false
 USE_CACHE=false
@@ -98,7 +99,13 @@ while [ $# -gt 0 ]; do
       exit 1
       ;;
     *)
+      if [ "$SEARCH_DIR_SET" = true ]; then
+        echo "error: too many path arguments" >&2
+        echo "Usage: git cd [path] [options]" >&2
+        exit 1
+      fi
       SEARCH_DIR="$1"
+      SEARCH_DIR_SET=true
       shift
       ;;
   esac

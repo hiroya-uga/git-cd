@@ -150,6 +150,16 @@ pwsh -NoProfile -File "%~dp0fzf.ps1"
             $result.Stdout | Should -Match 'Usage: git cd \[path\] \[options\]'
         }
 
+        It 'returns an error when multiple path arguments are given' {
+            $result = Invoke-GitCdPs1 -TestRoot $TestRoot -Arguments @(
+                (Join-Path $TestRoot 'repo1'),
+                (Join-Path $TestRoot 'projects')
+            )
+
+            $result.Status | Should -Be 1
+            $result.Stderr | Should -Match 'error: too many path arguments'
+        }
+
         It 'returns an error when the search root does not exist' {
             $missingPath = Join-Path $TestRoot 'does-not-exist'
             $result = Invoke-GitCdPs1 -TestRoot $TestRoot -Arguments @($missingPath)
