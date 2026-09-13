@@ -22,6 +22,7 @@ if (-not $env:USERPROFILE) {
 
 $configuredRoot = & git config --global --get git-cd.root 2>$null
 $SearchPath = if ($configuredRoot) { $configuredRoot } else { $env:USERPROFILE }
+$SearchPathSet = $false
 
 function Show-Usage {
     Write-Host "Usage: git cd [path] [options]"
@@ -54,7 +55,14 @@ while ($i -lt $args.Count) {
         '--help'       { Show-Usage; exit 0 }
         '-h'           { Show-Usage; exit 0 }
         default {
-            if ($args[$i] -notlike '--*') { $SearchPath = $args[$i] }
+            if ($args[$i] -notlike '--*') {
+                if ($SearchPathSet) {
+                    Write-Stderr "error: too many path arguments"
+                    Exit-WithError "Usage: git cd [path] [options]"
+                }
+                $SearchPath = $args[$i]
+                $SearchPathSet = $true
+            }
             else { Exit-WithError "Unknown option: $($args[$i])" }
         }
     }

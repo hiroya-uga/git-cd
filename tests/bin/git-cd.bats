@@ -126,6 +126,13 @@ assert_file_contains_exactly() {
   [[ "$output" == *"Usage: git cd [path] [options]"* ]]
 }
 
+@test "returns an error when multiple path arguments are given" {
+  run_git_cd "$TEST_ROOT/repo1" "$TEST_ROOT/projects"
+
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"error: too many path arguments"* ]]
+}
+
 @test "returns an error when the search root does not exist" {
   run_git_cd "$TEST_ROOT/does-not-exist"
 
