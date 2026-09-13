@@ -10,6 +10,7 @@ USE_CACHE=false
 usage() {
   cat >&2 <<EOF
 Usage: git cd [path] [options]
+       git-cd init <zsh|bash>
 
 Navigate to a git repository interactively.
 
@@ -22,8 +23,40 @@ Options:
 Configuration:
   git config --global git-cd.root <path>
                   Set the default search directory (overrides \$HOME)
+
+'git-cd init <zsh|bash>' prints the shell function that lets 'git cd'
+change the current shell's directory. Add this to your rc file:
+
+  eval "\$(git-cd init zsh)"
 EOF
 }
+
+print_init() {
+  case "${1:-}" in
+    zsh|bash)
+      cat <<'EOF'
+git() {
+  if [ "${1:-}" = "cd" ]; then
+    shift
+    local dir
+    dir=$(command git-cd "$@") && [ -n "$dir" ] && builtin cd "$dir"
+  else
+    command git "$@"
+  fi
+}
+EOF
+      ;;
+    *)
+      echo "Usage: git-cd init <zsh|bash>" >&2
+      exit 1
+      ;;
+  esac
+}
+
+if [ "${1:-}" = "init" ]; then
+  print_init "${2:-}"
+  exit 0
+fi
 
 find_repos() {
   local prune_dirs=( -name "node_modules" -o -name "Library" -o -name ".Trash" )

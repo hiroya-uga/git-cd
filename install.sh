@@ -6,23 +6,6 @@ INSTALL_DIR="${HOME}/.local/bin"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 ZSH_RC_BASENAME=".zshrc"
 
-INSTALL_DATE="$(date '+%Y-%m-%d %H:%M:%S')"
-SHELL_FUNCTION_HEAD="
-# git-cd BEGIN
-# Installed: $INSTALL_DATE"
-SHELL_FUNCTION_BODY='
-git() {
-  if [ "${1:-}" = "cd" ]; then
-    shift
-    local dir
-    dir=$(command git-cd "$@") && [ -n "$dir" ] && builtin cd "$dir"
-  else
-    command git "$@"
-  fi
-}
-# git-cd END'
-SHELL_FUNCTION="${SHELL_FUNCTION_HEAD}${SHELL_FUNCTION_BODY}"
-
 show_help() {
   cat <<'EOF'
 Usage: install.sh [options]
@@ -65,13 +48,16 @@ else
   echo "Downloaded: $INSTALL_DIR/git-cd"
 fi
 
-# Determine rc file
+# Determine shell type and rc file
 if [ "$ZSH_RC_BASENAME" = ".zshrc.local" ]; then
   RC_FILE="${ZDOTDIR:-$HOME}/$ZSH_RC_BASENAME"
+  SHELL_TYPE="zsh"
 elif [ "$(basename "${SHELL:-}")" = "zsh" ]; then
   RC_FILE="${ZDOTDIR:-$HOME}/$ZSH_RC_BASENAME"
+  SHELL_TYPE="zsh"
 else
   RC_FILE="$HOME/.bashrc"
+  SHELL_TYPE="bash"
 fi
 
 # Add INSTALL_DIR to PATH in rc file if not already present
@@ -80,20 +66,14 @@ if ! grep -q '\.local/bin' "$RC_FILE" 2>/dev/null; then
   echo "Added $INSTALL_DIR to PATH in $RC_FILE"
 fi
 
-# Append or update shell function
-if grep -q "# git-cd BEGIN" "$RC_FILE" 2>/dev/null; then
-  _FUNC_FILE="$(mktemp)"
-  printf '%s' "$SHELL_FUNCTION" > "$_FUNC_FILE"
-  FUNC_FILE="$_FUNC_FILE" perl -i -0pe '
-    my $r = do { local $/; open(my $fh, "<", $ENV{FUNC_FILE}) or die; <$fh> };
-    $r =~ s/^\s*//;
-    s/# git-cd BEGIN.*?# git-cd END/$r/s;
-  ' "$RC_FILE"
-  rm -f "$_FUNC_FILE"
-  echo "Updated shell function in $RC_FILE"
+HOOK_LINE="eval \"\$(git-cd init $SHELL_TYPE)\" # git-cd"
+
+# Append shell hook if not already present
+if grep -q "# git-cd" "$RC_FILE" 2>/dev/null; then
+  echo "Shell hook already exists in $RC_FILE"
 else
-  printf '%s\n' "$SHELL_FUNCTION" >> "$RC_FILE"
-  echo "Added shell function to $RC_FILE"
+  printf '%s\n' "$HOOK_LINE" >> "$RC_FILE"
+  echo "Added shell hook to $RC_FILE"
 fi
 
 echo ""
